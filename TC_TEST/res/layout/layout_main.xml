@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rl_main">
+
+  	
+
+
+    
+    
+    <TextView
+        android:id="@+id/tv_debug"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:textSize="21sp"
+        android:textColor="#0000ff"
+        ></TextView>
+
+    
+    
+    <LinearLayout
+        android:padding="20dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical"
+        >
+        
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="#ff00ff"
+                android:text="@string/destip"
+                />
+            
+            <EditText 
+                android:layout_height="40dp"
+                android:layout_width="100dp"
+                android:id="@+id/et_ip"
+                android:inputType="number"
+                android:maxLength="3"
+                android:nextFocusDown="@+id/et_port"
+                />
+                
+            
+            
+        </LinearLayout>
+        
+        
+        <LinearLayout
+            android:layout_height="wrap_content"
+        	android:layout_width="wrap_content"
+        	android:orientation="horizontal"
+        	>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+				android:textColor="#ff00ff"
+				android:text="@string/port"
+				/>
+            
+            <EditText
+                android:layout_height="40dp"
+                android:layout_width="100dp"
+                android:id="@+id/et_port"
+                android:inputType="number"
+                android:maxLength="5"
+                />
+        </LinearLayout>
+        
+        
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_connect"
+           	android:text="@string/btnconnect"
+           	></Button>
+            
+        
+        
+        
+    </LinearLayout>
+    
+</RelativeLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TC_TEST</string>
+    <string name="hello_world">Hello world!</string>
+	<string name="desc">Content Description</string>
+	<string name="destip">Destination IP: 192.168.0.</string>
+	<string name="port">Port</string>
+	<string name="btnconnect">Connect OSC</string>
+</resources>
