@@ -1,5 +1,8 @@
 package kr.tangomike.leeum2014.tctest;
 
+import com.illposed.osc.OSCBundle;
+import com.illposed.osc.OSCMessage;
+
 import tuioDroid.osc.OSCInterface;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -102,7 +105,10 @@ public class MainActivity extends Activity {
 				
 				
 				setText();
-				if(isOSCConnected)	sendOSC();
+				if(oscInterface.isReachable()){
+					isOSCConnected = true;
+					sendOSC();
+				}
 				
 				
 				return true;
@@ -120,22 +126,28 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				
 				
+				String strIP = etIP.getText().toString();
+				String strPort = etPort.getText().toString();
 				
+				android.util.Log.i("osc", strIP + ":" + strPort);
 				
-				if(etPort.getText().toString() != "" && etIP.getText().toString() != ""){
+			
+				
+				if(strIP.matches("") || strPort.matches("")){
 					
 					Toast toast = Toast.makeText(getApplicationContext(), "fill ip and port", Toast.LENGTH_SHORT);
 					toast.show();
 					
 				}else{
 				
-					String serverIP = "192.168.0." + etIP.getText().toString();
-					int serverPort = Integer.parseInt(etPort.getText().toString());
+					if(oscInterface == null || !oscInterface.isReachable()){
+						String serverIP = "192.168.0." + etIP.getText().toString();
+						int serverPort = Integer.parseInt(etPort.getText().toString());
+						
+						oscInterface = new OSCInterface(serverIP, serverPort);
 					
-					oscInterface = new OSCInterface(serverIP, serverPort);
-				
-					if(oscInterface.isReachable()) isOSCConnected = true;
-				
+	//					if(oscInterface.isReachable()) isOSCConnected = true;
+					}
 					
 				}
 				
@@ -176,6 +188,22 @@ public class MainActivity extends Activity {
 	
 	private void sendOSC(){
 		
+		OSCBundle oscBundle = new OSCBundle();
+		
+		Object outputData[] = new Object[4];
+		
+		outputData[0] = (Integer) touchCount;
+		outputData[1] = (Double) distNow;
+		outputData[2] = (Double) distDiff;
+		outputData[3] = (Integer) mode;
+		
+		oscBundle.addPacket(new OSCMessage("/Void/Leeum", outputData));
+		
+
+		oscInterface.sendOSCBundle(oscBundle);
+		
+		
+		android.util.Log.i("tctest", "" + distNow);
 		
 	}
 }
