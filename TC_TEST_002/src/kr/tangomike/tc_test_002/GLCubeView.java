@@ -49,8 +49,10 @@ public class GLCubeView extends GLSurfaceView {
     public void onResume(){
     } //do stuff
      
-    @Override 
-    public boolean onTouchEvent(MotionEvent event)
+//    @Override 
+    
+//    public boolean onTouchEvent(MotionEvent event)
+    public boolean retriveTouchEvent(MotionEvent event)
     {
 	        if (event != null)
 	        {
@@ -90,6 +92,18 @@ public class GLCubeView extends GLSurfaceView {
 	        	}
 	            requestRender();
 	        }
+	        
+//	        String str = "";
+//	        
+//	        for(int i = 0; i < mRenderer.m_fProjMatrix.length; i++){
+//	        	str += i + " " + mRenderer.m_fProjMatrix[i] + "\n";
+//	        }
+//	        
+//	        android.util.Log.i("delta", str);
+//	        
+	        
+	        
+	        
             return true;
     }
     
@@ -100,7 +114,7 @@ public class GLCubeView extends GLSurfaceView {
     	requestRender();
     }
     
-    private class CubeRenderer implements Renderer {
+    public class CubeRenderer implements Renderer {
     	
     	volatile public float mDeltaX, mDeltaY, mDeltaZ;
     	
