@@ -27,7 +27,9 @@ import android.view.*;
 import android.view.ViewGroup.LayoutParams;
 //import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Color;
 import android.hardware.*;
 import java.net.*;
 
@@ -88,6 +90,19 @@ public class MainActivity extends Activity {
 	
 	private boolean showSettings = false;
 	 
+	
+	
+	private static final int MODE_PAN = 0x00;
+	private static final int MODE_ZOOM = 0x01;
+	
+	private float posX, posY, posCenterX, posCenterY;
+	private double distOld, distNow, distDiff;
+	
+	private int touchCount, mode;
+	
+	private TextView tvDebug;
+	
+	
 	/**
 	 *  Called when the activity is first created. 
 	 */
@@ -99,7 +114,7 @@ public class MainActivity extends Activity {
         SharedPreferences settings = this.getPreferences(MODE_PRIVATE);
       
         /* get Values */
-        oscIP = settings.getString("myIP", "192.168.0.5");
+        oscIP = settings.getString("myIP", "192.168.0.9");
         oscPort = settings.getInt("myPort", 3333);
         drawAdditionalInfo = settings.getBoolean("ExtraInfo", false);
         sendPeriodicUpdates = settings.getBoolean("VerboseTUIO", true);
@@ -115,20 +130,20 @@ public class MainActivity extends Activity {
         frameLayout.setLayoutParams(frameLP);
         frameLayout.addView(touchView);
         
-        ImageView logoHoam = new ImageView(this);
-        logoHoam.setImageResource(R.drawable.logo_hoam);
-        logoHoam.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        logoHoam.setX(692);
-        logoHoam.setY(1178);
-        frameLayout.addView(logoHoam);
-        
-        
-        ImageView guideVertical = new ImageView(this);
-        guideVertical.setImageResource(R.drawable.guide_vertical);
-        guideVertical.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        guideVertical.setX(28);
-        guideVertical.setY(23);
-        frameLayout.addView(guideVertical);
+//        ImageView logoHoam = new ImageView(this);
+//        logoHoam.setImageResource(R.drawable.logo_hoam);
+//        logoHoam.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+//        logoHoam.setX(692);
+//        logoHoam.setY(1178);
+//        frameLayout.addView(logoHoam);
+//        
+//        
+//        ImageView guideVertical = new ImageView(this);
+//        guideVertical.setImageResource(R.drawable.guide_vertical);
+//        guideVertical.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+//        guideVertical.setX(28);
+//        guideVertical.setY(23);
+//        frameLayout.addView(guideVertical);
 
 
         
@@ -152,6 +167,15 @@ public class MainActivity extends Activity {
         setContentView(frameLayout);
         
         
+        tvDebug = new TextView(this);
+        tvDebug.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        tvDebug.setX(10);
+        tvDebug.setY(10);
+        tvDebug.setTextColor(Color.MAGENTA);
+        
+        
+        frameLayout.addView(tvDebug);
+        
         sensorManager = (SensorManager) this.getBaseContext().getSystemService(Context.SENSOR_SERVICE);
         
 
@@ -159,9 +183,83 @@ public class MainActivity extends Activity {
         super.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //super.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
+
+        frameLayout.setOnTouchListener(new View.OnTouchListener() {
+			
+			public boolean onTouch(View arg0, MotionEvent event) {
+				// TODO Auto-generated method stub
+				
+				
+				mode = MODE_PAN;
+				
+				touchCount = event.getPointerCount();
+				if(touchCount  == 1) mode = MODE_PAN;
+				else if(touchCount >= 2) mode = MODE_ZOOM;
+				
+				switch(mode){
+				case MODE_PAN:
+					
+					posX = event.getX(0);
+					posY = event.getY(0);
+					posCenterX = posCenterY = 0;
+					
+					
+					break;
+					
+				case MODE_ZOOM:
+					posCenterX = (event.getX(0) + event.getX(1)) / 2;
+					posCenterY = (event.getY(0) + event.getY(1)) / 2;
+					
+					distNow = Math.sqrt( Math.pow(event.getX(0) - event.getX(1), 2) + Math.pow(event.getY(0) - event.getY(1), 2) );
+					distDiff = distNow - distOld;
+					distOld = distNow;
+					
+					
+					
+					break;
+					
+				default:
+					break;
+				}
+				
+				
+				
+				
+				
+				
+				touchView.retrieveTouch(event);
+				
+				
+				
+				setText();
+				
+				
+				return true;
+			}
+		});
+        
     }
     
 
+	private void setText(){
+		
+		String strTmp = 
+				"Touch Count: " + touchCount + "\n\n"
+				+ "Position: \n" + posX + "\n" + posY + "\n\n" 
+				+ "Center: \n" + posCenterX + "\n" + posCenterY + "\n\n"
+				+ "Distance: " + distNow + "\n\n" 
+				+ "Difference: " + distDiff;
+		
+		if(mode == MODE_PAN) strTmp += "\n\nMode: PAN";
+		else strTmp += "\n\nMODE: ZOOM";
+		
+		
+		tvDebug.setText(strTmp);
+		
+		
+		
+	}
+    
 	/**
      *  Called when the options menu is created
      *  Options menu is defined in m.xml 
