@@ -2,6 +2,7 @@ package kr.tangomike.tc_test_002;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -16,6 +17,18 @@ public class TestActivity extends Activity {
 	
 	private GLCubeView view;
 	private TextView tvDebug;
+	
+	
+	/*
+	 * 
+	 * variables for settings
+	 * 
+	 */
+	
+	private String serverIP;
+	private int serverPort;
+	
+	
 	@Override
 	protected void onCreate(Bundle sis){
 		super.onCreate(sis);
@@ -32,6 +45,10 @@ public class TestActivity extends Activity {
 //		
         
         
+        SharedPreferences settings = this.getPreferences(MODE_PRIVATE);
+        serverIP = settings.getString("myIP", "192.168.0.9");
+        serverPort = settings.getInt("myPort", 3333);
+        
         
         FrameLayout frm = new FrameLayout(this);
         frm.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -39,7 +56,7 @@ public class TestActivity extends Activity {
         
         
         
-        view = new GLCubeView(this);
+        view = new GLCubeView(this, serverIP, serverPort);
         
         frm.addView(view);
         
@@ -84,5 +101,13 @@ public class TestActivity extends Activity {
 		tvDebug.setText(str);
 	}
 	
+	@Override
+	public void onDestroy(){
+		view.mThread.stop();
+		super.onDestroy();
+		
+		
+		
+	}
 
 }

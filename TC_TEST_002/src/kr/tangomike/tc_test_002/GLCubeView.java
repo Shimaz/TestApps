@@ -7,10 +7,17 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.illposed.osc.OSCBundle;
+import com.illposed.osc.OSCMessage;
+
+import tuioDroid.osc.OSCInterface;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
@@ -32,21 +39,46 @@ public class GLCubeView extends GLSurfaceView {
 	private float mPreviousX;
 	private float mPreviousY;
 	private float mPreviousDeg;
-
-    public GLCubeView(Context context) {
+	
+	
+	private float cameraPosX;
+	private float cameraPosY;
+	private float cameraFov;
+	
+	private OSCInterface oscInterface;
+	private boolean running;
+	private static final int FRAME_RATE = 20;
+	
+	public Thread mThread;
+	
+    public GLCubeView(Context context, String ip, int port) {
             super(context);
             setEGLContextClientVersion(2);
             setRenderer(mRenderer = new CubeRenderer());
             setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
             	//important: only renders when requestRender() is called, saving processing
+            
+            running = false;
+            
+            cameraPosX = 0;
+            cameraPosY = 0;
+            cameraFov = 50;
+            
+            
+            oscInterface = new OSCInterface(ip, port);
+            
     }
+    
+
     
     @Override
     public void onPause(){
+    	running = false;
     } //do stuff
     
     @Override
     public void onResume(){
+   
     } //do stuff
      
 //    @Override 
@@ -276,6 +308,42 @@ public class GLCubeView extends GLSurfaceView {
                 iTexLoc = GLES20.glGetUniformLocation(iProgId, "u_texId");
                 iTexCoords = GLES20.glGetAttribLocation(iProgId, "a_texCoords");
                 iTexId = CreateCubeTexture();
+                
+                running = true;
+                
+                mThread =            
+        		new Thread(new Runnable() {
+        		    public void run() {
+        		      boolean network = oscInterface.isReachable();
+        		      while (running) {
+        		    	  
+            			  oscInterface.checkStatus();
+            			  boolean status = oscInterface.isReachable();
+        		    	  if (network!=status) {
+        		    		  network = status;
+        		    		  }		    		  
+        		    	  if (running) {
+        		    		  try { sendTUIOdata(); }
+        		    	  	  catch (Exception e) {}
+        		    	  }
+        		    	  try { Thread.sleep(1000/FRAME_RATE); }
+        		    	  catch (Exception e) {}  
+        		      
+        		      	}
+        		    	 
+        		    	  
+        		      }
+        		    
+        		});
+                
+                mThread.start();
+                
+        }
+        
+        public void onSurfaceDestroyed(GL10 arg0){
+        	
+        	running = false;
+        	mThread.stop();
         }
         
         public int CreateCubeTexture() {            
@@ -390,5 +458,37 @@ public class GLCubeView extends GLSurfaceView {
 	        GLES20.glDeleteShader(iVShader);
 	        GLES20.glDeleteShader(iFShader);
 	        return iProgId;
-	} 
+	}
+	
+	/**
+	 * Sends the TUIO Data
+	 * @param blobList
+	 */
+	public void sendTUIOdata () throws ArrayIndexOutOfBoundsException {
+	
+		OSCBundle oscBundle = new OSCBundle();
+		
+		// Navigator Data Message
+		Object outputData[] = new Object[19];
+		
+		for(int i = 0; i < 16; i++){
+			outputData[i] = (Float) mRenderer.m_fVPMatrix[i];
+			
+		}
+
+		
+		outputData[16] = (Float) cameraPosX;
+		outputData[17] = (Float) cameraPosY;
+		outputData[18] = (Float) cameraFov;
+		
+		
+		oscBundle.addPacket(new OSCMessage("/Void/Leeum", outputData));
+		
+		android.util.Log.i("osc", "sent");
+
+		oscInterface.sendOSCBundle(oscBundle);
+		
+	}
+
+	
 }

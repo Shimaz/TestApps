@@ -207,15 +207,15 @@ public class MainActivity extends Activity {
         ivWheel = new ImageView(this);
         ivWheel.setImageBitmap(arrWheelUp.get(0));
         ivWheel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        ivWheel.setX(131);
-        ivWheel.setY(1075);
+        ivWheel.setX(371);
+        ivWheel.setY(672);
         
         frameLayout.addView(ivWheel);
         
         sBar = new SeekBar(this);
         sBar.setLayoutParams(new LayoutParams(538, 130));
-        sBar.setX(131);
-        sBar.setY(1045);
+        sBar.setX(371);
+        sBar.setY(672);
         sBar.setMax(seekBarLength);
         sBar.setProgress(0);
         sBar.setAlpha(0);
@@ -541,16 +541,16 @@ public class MainActivity extends Activity {
     	
     	switch(screenOrientation){
     	
-    		case 0: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    		case 0: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     		break;
     			
-    		case 1: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    		case 1: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     		break;
 				
-    		case 2: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    		case 2: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     		break;
 	
-    		default: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    		default: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     		break;
     	}	
     }
