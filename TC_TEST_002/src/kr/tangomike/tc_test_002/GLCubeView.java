@@ -48,6 +48,17 @@ public class GLCubeView extends GLSurfaceView {
 	
 	private static final float MAX_FOV = 50;
 	private static final float MIN_FOV = 5;
+	private static final float FOV_DIST_RATIO = 0.5f;
+	
+	private float distOld;
+	private float distNow;
+	private float distDiff;
+	private float posXOld;
+	private float posXNow;
+	private float posYOld;
+	private float posYNow;
+	
+	
 	
 	private OSCInterface oscInterface;
 	private boolean running;
@@ -120,7 +131,23 @@ public class GLCubeView extends GLSurfaceView {
 	        			mPreviousDeg = deg;
 			            mPreviousX = event.getX();
 			            mPreviousY = event.getY(); 
-	        			//return true;
+			            
+			            
+			            
+			            
+			            distNow = (float) Math.sqrt( Math.pow(event.getX(0) - event.getX(1), 2) + Math.pow(event.getY(0) - event.getY(1), 2) );
+						distDiff = distNow - distOld;
+						distOld = distNow;
+			            
+						
+						cameraFov = cameraFov + distDiff;
+			            if(cameraFov < MAX_FOV){
+			            	cameraFov = MAX_FOV;
+			            }else if(cameraFov < MIN_FOV){
+			            	cameraFov = MIN_FOV;
+			            }
+			            
+	        			return true;
 	        		} 
 					float ddeg = deg-mPreviousDeg;
 					mRenderer.mDeltaZ -= ddeg;
@@ -473,7 +500,7 @@ public class GLCubeView extends GLSurfaceView {
 		OSCBundle oscBundle = new OSCBundle();
 		
 		// Navigator Data Message
-		Object outputData[] = new Object[19];
+		Object outputData[] = new Object[20];
 		
 		for(int i = 0; i < 16; i++){
 			outputData[i] = (Float) mRenderer.m_fVPMatrix[i];
@@ -487,6 +514,7 @@ public class GLCubeView extends GLSurfaceView {
 		outputData[16] = (Float) cameraPosX;
 		outputData[17] = (Float) cameraPosY;
 		outputData[18] = (Float) cameraFov;
+		outputData[19] = (Float) distDiff;
 		
 		
 		oscBundle.addPacket(new OSCMessage("/Void/Leeum", outputData));
