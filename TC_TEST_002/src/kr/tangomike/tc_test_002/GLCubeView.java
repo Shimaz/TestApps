@@ -45,6 +45,10 @@ public class GLCubeView extends GLSurfaceView {
 	private float cameraPosY;
 	private float cameraFov;
 	
+	
+	private static final float MAX_FOV = 50;
+	private static final float MIN_FOV = 5;
+	
 	private OSCInterface oscInterface;
 	private boolean running;
 	private static final int FRAME_RATE = 20;
@@ -116,7 +120,7 @@ public class GLCubeView extends GLSurfaceView {
 	        			mPreviousDeg = deg;
 			            mPreviousX = event.getX();
 			            mPreviousY = event.getY(); 
-	        			return true;
+	        			//return true;
 	        		} 
 					float ddeg = deg-mPreviousDeg;
 					mRenderer.mDeltaZ -= ddeg;
@@ -473,9 +477,12 @@ public class GLCubeView extends GLSurfaceView {
 		
 		for(int i = 0; i < 16; i++){
 			outputData[i] = (Float) mRenderer.m_fVPMatrix[i];
+//			outputData[i] = (Float) mRenderer.m_fViewMatrix[i]
 			
 		}
 
+		
+	
 		
 		outputData[16] = (Float) cameraPosX;
 		outputData[17] = (Float) cameraPosY;
